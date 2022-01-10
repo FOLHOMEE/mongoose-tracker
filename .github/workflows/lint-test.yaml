@@ -1,0 +1,24 @@
+name: Launch linter and tests
+
+on: [push]
+
+jobs:
+  linter-and-test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+      - name: Uses nodeJs
+        uses: actions/setup-node@v2
+        with:
+          node-version: '14.x'
+      - name: Install dependencies
+        uses: bahmutov/npm-install@HEAD
+      - name: Install peer for testing
+        run: yarn peer
+      - name: Run linter
+        run: yarn lint
+      - name: Run Tests
+        run: yarn test
+        env:
+          CI: true
