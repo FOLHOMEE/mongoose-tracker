@@ -1,0 +1,54 @@
+{
+  "name": "mongoose-tracker",
+  "version": "1.0.0",
+  "description": "Is a mongoose plugin that automatically keeps track of when the document has been created, updated and optionally when some fields have been modified",
+  "main": "./build/index.js",
+  "types": "./build/index.d.ts",
+  "module": "./build/index.es.js",
+  "author": "barder60 <kaderate.yamamoto@hotmail.fr>",
+  "license": "MIT",
+  "scripts": {
+    "build": "rollup -c",
+    "clean": "rimraf build",
+    "peer": "add-no-save --peer-deps",
+    "lint": "eslint --ext .js,.ts,.tsx src",
+    "test": "./node_modules/.bin/jest --forceExit",
+    "lint:fix": "eslint --fix --ext .js,.ts,.tsx src"
+  },
+  "engines": {
+    "npm": ">=6.4.0",
+    "node": ">=14.0.0"
+  },
+  "peerDependencies": {
+    "mongoose": "^6.1.5"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.16.7",
+    "@rollup/plugin-commonjs": "^21.0.1",
+    "@rollup/plugin-json": "^4.1.0",
+    "@rollup/plugin-node-resolve": "^13.1.3",
+    "@rollup/plugin-typescript": "^8.3.0",
+    "@typescript-eslint/eslint-plugin": "^5.9.0",
+    "babel-loader": "^8.2.3",
+    "eslint": "^8.6.0",
+    "eslint-config-standard": "^16.0.3",
+    "eslint-config-standard-with-typescript": "^21.0.1",
+    "eslint-plugin-flowtype": "^8.0.3",
+    "eslint-plugin-import": "^2.25.4",
+    "eslint-plugin-jest": "^25.3.4",
+    "eslint-plugin-node": "^11.1.0",
+    "eslint-plugin-promise": "^6.0.0",
+    "eslint-plugin-standard": "^5.0.0",
+    "jest": "^27.4.7",
+    "rimraf": "^3.0.2",
+    "rollup": "^2.63.0",
+    "rollup-plugin-dts": "^4.1.0",
+    "rollup-plugin-filesize": "^9.1.2",
+    "rollup-plugin-peer-deps-external": "^2.2.4",
+    "rollup-plugin-terser": "^7.0.2",
+    "ts-jest": "^27.1.2",
+    "ts-standard": "^11.0.0",
+    "typescript": "^4.5.4",
+    "yarn-add-no-save": "^1.0.3"
+  }
+}
