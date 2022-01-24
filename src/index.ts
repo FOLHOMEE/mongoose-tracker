@@ -52,7 +52,7 @@ const mongooseTracker = function (schema: Schema, options: Options): void {
     const oldTrackedFields = docUpdated.get(`${name}`)
 
     void this.set({
-      [name]: [...trackedFields, ...oldTrackedFields]
+      [name]: [...oldTrackedFields, ...trackedFields]
     })
   })
 }
