@@ -1,6 +1,5 @@
-import moment from 'moment'
 import { Schema } from 'mongoose'
-import { get, includes } from 'lodash'
+import { get, includes, isNull, toPairs, reduce } from 'lodash'
 
 interface Options {
   fieldsToTrack: [string]
@@ -24,32 +23,37 @@ const mongooseTracker = function (schema: Schema, options: Options): void {
         this.get(`${name}`).push({
           field: `${field}`,
           changedTo: get(this, field, ''),
-          at: moment().toDate()
+          at: Date.now()
         })
       }
     }
   })
 
-  schema.pre(['updateOne', 'findOneAndUpdate', 'update', 'updateMany'], function (): void {
+  schema.pre(['updateOne', 'findOneAndUpdate', 'update', 'updateMany'], async function () {
     const updatedFields = this.getUpdate()
 
-    if (updatedFields == null) {
+    if (isNull(updatedFields)) {
       return
     }
 
-    for (const [key, value] of Object.entries(updatedFields)) {
+    const trackedFields = reduce(toPairs(updatedFields), (acc, [key, value]: [string, any]): any => {
       if (includes(fieldsToTrack, key)) {
-        void this.update({}, {
-          $push: {
-            [name]: {
-              field: `${key}`,
-              changedTo: value,
-              at: moment().toDate()
-            }
-          }
-        })
+        return [...acc, {
+          field: `${key}`,
+          changedTo: value,
+          at: Date.now()
+        }]
       }
-    }
+
+      return acc
+    }, [])
+
+    const docUpdated = await this.model.findOne(this.getQuery())
+    const oldTrackedFields = docUpdated.get(`${name}`)
+
+    void this.set({
+      [name]: [...trackedFields, ...oldTrackedFields]
+    })
   })
 }
 

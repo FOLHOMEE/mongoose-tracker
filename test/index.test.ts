@@ -14,18 +14,22 @@ describe('mongooseTracker tests', () => {
     const mongoUrl = await mongod.getUri()
 
     await mongoose.connect(mongoUrl)
+  })
 
+  beforeEach(async () => {
     const collections = mongoose.connection.collections
 
     for (const key in collections) {
       const collection = collections[key]
       await collection.deleteMany({})
     }
+
   })
 
   afterAll(async () => {
     await mongoose.disconnect()
   })
+
   describe('name system', () => {
     it('should create Array in model with __updates by default', () => {
       const schema = new Schema({
