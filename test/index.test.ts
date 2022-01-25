@@ -611,6 +611,47 @@ describe('mongooseTracker tests', () => {
           })
         )
       })
+      it('should update 2 doc __updates if a values changed in each doc which is tracked', async () => {
+        const schema = new Schema({
+          name: String,
+          price: Number,
+          toto: String
+        })
+
+        schema.plugin(mongooseTracker, {
+          fieldsToTrack: ['name', 'toto']
+        })
+
+        const Model = mongoose.model('test21', schema)
+
+        await Model.create({ price: 10, name: "nom", toto: "c est moi" })
+        await Model.create({ price: 10, name: "nom", toto: "c est moi" })
+        await Model.updateMany({ price: 10 }, { name: "nouveauNom" })
+
+        const docs = await Model.find({ price: 10 })
+        console.log(JSON.stringify(docs, null, 4))
+
+        expect(docs[0]).toEqual(
+          expect.objectContaining({
+            "__updates": expect.arrayContaining([
+              expect.objectContaining({
+                changedTo: 'nouveauNom',
+                field: 'name'
+              })
+            ])
+          })
+        )
+        expect(docs[1]).toEqual(
+          expect.objectContaining({
+            "__updates": expect.arrayContaining([
+              expect.objectContaining({
+                changedTo: 'nouveauNom',
+                field: 'name'
+              })
+            ])
+          })
+        )
+      })
     })
   })
 })
