@@ -51,9 +51,9 @@ const mongooseTracker = function (schema: Schema, options: Options): void {
     const docUpdated = await this.model.findOne(this.getQuery())
     const oldTrackedFields = docUpdated.get(`${name}`)
 
-    void this.set({
+    this.set({
       [name]: [...oldTrackedFields, ...trackedFields]
-    })
+    }).catch((err) => console.log(err))
   })
 }
 
