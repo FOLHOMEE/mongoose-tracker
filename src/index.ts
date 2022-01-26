@@ -26,7 +26,7 @@ const mongooseTracker = function (schema: Schema, options: Options): void {
     }
   })
 
-  schema.pre(['updateOne', 'findOneAndUpdate', 'update', 'updateMany'], async function (done) {
+  schema.pre(['updateOne', 'findOneAndUpdate', 'update', 'updateMany'], async function () {
     const updatedFields = this.getUpdate()
 
     if (isNull(updatedFields)) {
