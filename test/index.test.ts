@@ -1,9 +1,8 @@
-import mongoose from "mongoose"
+import mongoose from 'mongoose'
 import { Schema } from 'mongoose'
 import { MongoMemoryServer } from 'mongodb-memory-server'
 
 import mongooseTracker from '../src/index'
-
 
 describe('mongooseTracker tests', () => {
   beforeAll(async () => {
@@ -21,17 +20,17 @@ describe('mongooseTracker tests', () => {
 
     for (const key in collections) {
       const collection = collections[key]
+
       await collection.deleteMany({})
     }
-
   })
 
   afterAll(async () => {
     await mongoose.disconnect()
   })
 
-  describe('name system', () => {
-    it('should create Array in model with __updates by default', () => {
+  describe('tracker array key name', () => {
+    it('should create Array in model with the key name "__updates" by default', () => {
       const schema = new Schema({
         name: String
       })
@@ -44,15 +43,15 @@ describe('mongooseTracker tests', () => {
 
 
       expect(doc).toEqual(expect.objectContaining({
-        "__updates": expect.any(Array)
+        '__updates': expect.any(Array)
       }))
     })
 
-    it('should create Array in model with the given name', () => {
+    it('should create Array in model with the key name "__tokens"', () => {
       const schema = new Schema({})
 
       schema.plugin(mongooseTracker, {
-        name: "__tokens"
+        name: '__tokens'
       })
 
       const Model = mongoose.model('test2', schema)
@@ -61,14 +60,15 @@ describe('mongooseTracker tests', () => {
 
       expect(doc).toEqual(
         expect.objectContaining({
-          "__tokens": expect.any(Array)
+          '__tokens': expect.any(Array)
         })
       )
     })
   })
+
   describe('pre functions', () => {
     describe('save function', () => {
-      it('should not update __updates if a value changed which is not tracked', () => {
+      it('should not add modified field in __updates if the field is not tracked', () => {
         const schema = new Schema({
           price: Number
         })
@@ -89,12 +89,12 @@ describe('mongooseTracker tests', () => {
 
         expect(doc).toEqual(
           expect.objectContaining({
-            "__updates": []
+            '__updates': []
           })
         )
       })
 
-      it('should update __updates if a 2 values changed which is tracked', async () => {
+      it('should add 2 modified fields in __updates if 2 fields are tracked', async () => {
         const schema = new Schema({
           name: String,
           price: Number,
@@ -117,13 +117,13 @@ describe('mongooseTracker tests', () => {
 
         expect(doc).toEqual(
           expect.objectContaining({
-            "__updates": expect.arrayContaining([
+            '__updates': expect.arrayContaining([
               expect.objectContaining({
-                changedTo: "c est mon nom",
-                field: "toto"
+                changedTo: 'c est mon nom',
+                field: 'toto'
               }), expect.objectContaining({
-                changedTo: "tata",
-                field: "name"
+                changedTo: 'tata',
+                field: 'name'
               })
             ])
           })
@@ -132,7 +132,7 @@ describe('mongooseTracker tests', () => {
     })
 
     describe('findOneAndUpdate function', () => {
-      it('should update __updates if a values changed which is tracked', async () => {
+      it('should add modified field in __updates if the field is tracked', async () => {
         const schema = new Schema({
           name: String,
           price: Number,
@@ -145,14 +145,14 @@ describe('mongooseTracker tests', () => {
 
         const Model = mongoose.model('test5', schema)
 
-        await Model.create({ price: 10, name: "nom", toto: "c est moi" })
-        await Model.findOneAndUpdate({ price: 10 }, { name: "nouveauNom" })
+        await Model.create({ price: 10, name: 'nom', toto: 'c est moi' })
+        await Model.findOneAndUpdate({ price: 10 }, { name: 'nouveauNom' })
 
         const doc = await Model.findOne({ price: 10 })
 
         expect(doc).toEqual(
           expect.objectContaining({
-            "__updates": expect.arrayContaining([
+            '__updates': expect.arrayContaining([
               expect.objectContaining({
                 changedTo: 'nouveauNom',
                 field: 'name'
@@ -161,7 +161,8 @@ describe('mongooseTracker tests', () => {
           })
         )
       })
-      it('should not update __updates if a values changed which is not tracked', async () => {
+
+      it('should not add modified field in __updates if the field is not tracked', async () => {
         const schema = new Schema({
           name: String,
           price: Number,
@@ -174,14 +175,14 @@ describe('mongooseTracker tests', () => {
 
         const Model = mongoose.model('test6', schema)
 
-        await Model.create({ price: 10, name: "nom", toto: "c est moi" })
-        await Model.findOneAndUpdate({ price: 10 }, { name: "nouveauNom" })
+        await Model.create({ price: 10, name: 'nom', toto: 'c est moi' })
+        await Model.findOneAndUpdate({ price: 10 }, { name: 'nouveauNom' })
 
         const doc = await Model.findOne({ price: 10 })
 
         expect(doc).toEqual(
           expect.objectContaining({
-            "__updates": expect.arrayContaining([
+            '__updates': expect.arrayContaining([
               expect.not.objectContaining({
                 changedTo: 'nouveauNom',
                 field: 'name'
@@ -190,7 +191,8 @@ describe('mongooseTracker tests', () => {
           })
         )
       })
-      it('should updates the given name in template if a values changed which is tracked', async () => {
+
+      it('should add modified field in __tokens if the field is tracked', async () => {
         const schema = new Schema({
           name: String,
           price: Number,
@@ -199,19 +201,19 @@ describe('mongooseTracker tests', () => {
 
         schema.plugin(mongooseTracker, {
           fieldsToTrack: ['name', 'toto'],
-          name: "__tokens"
+          name: '__tokens'
         })
 
         const Model = mongoose.model('test7', schema)
 
-        await Model.create({ price: 10, name: "nom", toto: "c est moi" })
-        await Model.findOneAndUpdate({ price: 10 }, { name: "nouveauNom" })
+        await Model.create({ price: 10, name: 'nom', toto: 'c est moi' })
+        await Model.findOneAndUpdate({ price: 10 }, { name: 'nouveauNom' })
 
         const doc = await Model.findOne({ price: 10 })
 
         expect(doc).toEqual(
           expect.objectContaining({
-            "__tokens": expect.arrayContaining([
+            '__tokens': expect.arrayContaining([
               expect.objectContaining({
                 changedTo: 'nouveauNom',
                 field: 'name'
@@ -220,7 +222,8 @@ describe('mongooseTracker tests', () => {
           })
         )
       })
-      it('should not update the given name in template if a values changed which is not tracked', async () => {
+
+      it('should not add modified field in __tokens if the field is not tracked', async () => {
         const schema = new Schema({
           name: String,
           price: Number,
@@ -229,19 +232,19 @@ describe('mongooseTracker tests', () => {
 
         schema.plugin(mongooseTracker, {
           fieldsToTrack: ['toto'],
-          name: "__tokens"
+          name: '__tokens'
         })
 
         const Model = mongoose.model('test8', schema)
 
-        await Model.create({ price: 10, name: "nom", toto: "c est moi" })
-        await Model.findOneAndUpdate({ price: 10 }, { name: "nouveauNom" })
+        await Model.create({ price: 10, name: 'nom', toto: 'c est moi' })
+        await Model.findOneAndUpdate({ price: 10 }, { name: 'nouveauNom' })
 
         const doc = await Model.findOne({ price: 10 })
 
         expect(doc).toEqual(
           expect.objectContaining({
-            "__tokens": expect.arrayContaining([
+            '__tokens': expect.arrayContaining([
               expect.not.objectContaining({
                 changedTo: 'nouveauNom',
                 field: 'name'
@@ -251,8 +254,9 @@ describe('mongooseTracker tests', () => {
         )
       })
     })
+
     describe('UpdateOne function', () => {
-      it('should update __updates if a values changed which is tracked', async () => {
+      it('should add modified field in __updates if the field is tracked', async () => {
         const schema = new Schema({
           name: String,
           price: Number,
@@ -265,14 +269,14 @@ describe('mongooseTracker tests', () => {
 
         const Model = mongoose.model('test9', schema)
 
-        await Model.create({ price: 10, name: "nom", toto: "c est moi" })
-        await Model.updateOne({ price: 10 }, { name: "nouveauNom" })
+        await Model.create({ price: 10, name: 'nom', toto: 'c est moi' })
+        await Model.updateOne({ price: 10 }, { name: 'nouveauNom' })
 
         const doc = await Model.findOne({ price: 10 })
 
         expect(doc).toEqual(
           expect.objectContaining({
-            "__updates": expect.arrayContaining([
+            '__updates': expect.arrayContaining([
               expect.objectContaining({
                 changedTo: 'nouveauNom',
                 field: 'name'
@@ -281,7 +285,8 @@ describe('mongooseTracker tests', () => {
           })
         )
       })
-      it('should not update __updates if a values changed which is not tracked', async () => {
+
+      it('should not modified field in __updates if the field is not tracked', async () => {
         const schema = new Schema({
           name: String,
           price: Number,
@@ -294,14 +299,14 @@ describe('mongooseTracker tests', () => {
 
         const Model = mongoose.model('test10', schema)
 
-        await Model.create({ price: 10, name: "nom", toto: "c est moi" })
-        await Model.updateOne({ price: 10 }, { name: "nouveauNom" })
+        await Model.create({ price: 10, name: 'nom', toto: 'c est moi' })
+        await Model.updateOne({ price: 10 }, { name: 'nouveauNom' })
 
         const doc = await Model.findOne({ price: 10 })
 
         expect(doc).toEqual(
           expect.objectContaining({
-            "__updates": expect.arrayContaining([
+            '__updates': expect.arrayContaining([
               expect.not.objectContaining({
                 changedTo: 'nouveauNom',
                 field: 'name'
@@ -310,7 +315,8 @@ describe('mongooseTracker tests', () => {
           })
         )
       })
-      it('should updates the given name in template if a values changed which is tracked', async () => {
+
+      it('should add modified field in __tokens if the field is tracked', async () => {
         const schema = new Schema({
           name: String,
           price: Number,
@@ -319,19 +325,19 @@ describe('mongooseTracker tests', () => {
 
         schema.plugin(mongooseTracker, {
           fieldsToTrack: ['name', 'toto'],
-          name: "__tokens"
+          name: '__tokens'
         })
 
         const Model = mongoose.model('test11', schema)
 
-        await Model.create({ price: 10, name: "nom", toto: "c est moi" })
-        await Model.updateOne({ price: 10 }, { name: "nouveauNom" })
+        await Model.create({ price: 10, name: 'nom', toto: 'c est moi' })
+        await Model.updateOne({ price: 10 }, { name: 'nouveauNom' })
 
         const doc = await Model.findOne({ price: 10 })
 
         expect(doc).toEqual(
           expect.objectContaining({
-            "__tokens": expect.arrayContaining([
+            '__tokens': expect.arrayContaining([
               expect.objectContaining({
                 changedTo: 'nouveauNom',
                 field: 'name'
@@ -339,8 +345,10 @@ describe('mongooseTracker tests', () => {
             ])
           })
         )
+
       })
-      it('should not update the given name in template if a values changed which is not tracked', async () => {
+
+      it('should not add modified field in __tokens if the field is not tracked', async () => {
         const schema = new Schema({
           name: String,
           price: Number,
@@ -349,19 +357,19 @@ describe('mongooseTracker tests', () => {
 
         schema.plugin(mongooseTracker, {
           fieldsToTrack: ['toto'],
-          name: "__tokens"
+          name: '__tokens'
         })
 
         const Model = mongoose.model('test12', schema)
 
-        await Model.create({ price: 10, name: "nom", toto: "c est moi" })
-        await Model.updateOne({ price: 10 }, { name: "nouveauNom" })
+        await Model.create({ price: 10, name: 'nom', toto: 'c est moi' })
+        await Model.updateOne({ price: 10 }, { name: 'nouveauNom' })
 
         const doc = await Model.findOne({ price: 10 })
 
         expect(doc).toEqual(
           expect.objectContaining({
-            "__tokens": expect.arrayContaining([
+            '__tokens': expect.arrayContaining([
               expect.not.objectContaining({
                 changedTo: 'nouveauNom',
                 field: 'name'
@@ -371,8 +379,9 @@ describe('mongooseTracker tests', () => {
         )
       })
     })
+
     describe('findByIdAndUpdate function', () => {
-      it('should update __updates if a values changed which is tracked', async () => {
+      it('should add modified field in __updates if the field is tracked', async () => {
         const schema = new Schema({
           name: String,
           price: Number,
@@ -385,15 +394,15 @@ describe('mongooseTracker tests', () => {
 
         const Model = mongoose.model('test13', schema)
 
-        const { _id } = await Model.create({ price: 10, name: "nom", toto: "c est moi" })
+        const { _id } = await Model.create({ price: 10, name: 'nom', toto: 'c est moi' })
 
-        await Model.findByIdAndUpdate(_id, { name: "nouveauNom" })
+        await Model.findByIdAndUpdate(_id, { name: 'nouveauNom' })
 
         const doc = await Model.findOne({ price: 10 })
 
         expect(doc).toEqual(
           expect.objectContaining({
-            "__updates": expect.arrayContaining([
+            '__updates': expect.arrayContaining([
               expect.objectContaining({
                 changedTo: 'nouveauNom',
                 field: 'name'
@@ -402,7 +411,8 @@ describe('mongooseTracker tests', () => {
           })
         )
       })
-      it('should not update __updates if a values changed which is not tracked', async () => {
+
+      it('should not add modified field in __updates if the field is not tracked', async () => {
         const schema = new Schema({
           name: String,
           price: Number,
@@ -415,14 +425,15 @@ describe('mongooseTracker tests', () => {
 
         const Model = mongoose.model('test14', schema)
 
-        const { _id } = await Model.create({ price: 10, name: "nom", toto: "c est moi" })
-        await Model.findByIdAndUpdate(_id, { name: "nouveauNom" })
+        const { _id } = await Model.create({ price: 10, name: 'nom', toto: 'c est moi' })
+
+        await Model.findByIdAndUpdate(_id, { name: 'nouveauNom' })
 
         const doc = await Model.findOne({ price: 10 })
 
         expect(doc).toEqual(
           expect.objectContaining({
-            "__updates": expect.arrayContaining([
+            '__updates': expect.arrayContaining([
               expect.not.objectContaining({
                 changedTo: 'nouveauNom',
                 field: 'name'
@@ -431,7 +442,8 @@ describe('mongooseTracker tests', () => {
           })
         )
       })
-      it('should updates the given name in template if a values changed which is tracked', async () => {
+
+      it('should add modified field in __tokens if the field is tracked', async () => {
         const schema = new Schema({
           name: String,
           price: Number,
@@ -440,19 +452,20 @@ describe('mongooseTracker tests', () => {
 
         schema.plugin(mongooseTracker, {
           fieldsToTrack: ['name', 'toto'],
-          name: "__tokens"
+          name: '__tokens'
         })
 
         const Model = mongoose.model('test15', schema)
 
-        const { _id } = await Model.create({ price: 10, name: "nom", toto: "c est moi" })
-        await Model.findByIdAndUpdate(_id, { name: "nouveauNom" })
+        const { _id } = await Model.create({ price: 10, name: 'nom', toto: 'c est moi' })
+
+        await Model.findByIdAndUpdate(_id, { name: 'nouveauNom' })
 
         const doc = await Model.findOne({ price: 10 })
 
         expect(doc).toEqual(
           expect.objectContaining({
-            "__tokens": expect.arrayContaining([
+            '__tokens': expect.arrayContaining([
               expect.objectContaining({
                 changedTo: 'nouveauNom',
                 field: 'name'
@@ -461,7 +474,8 @@ describe('mongooseTracker tests', () => {
           })
         )
       })
-      it('should not update the given name in template if a values changed which is not tracked', async () => {
+
+      it('should add modified field in __tokens if the field is not tracked', async () => {
         const schema = new Schema({
           name: String,
           price: Number,
@@ -470,19 +484,20 @@ describe('mongooseTracker tests', () => {
 
         schema.plugin(mongooseTracker, {
           fieldsToTrack: ['toto'],
-          name: "__tokens"
+          name: '__tokens'
         })
 
         const Model = mongoose.model('test16', schema)
 
-        const { _id } = await Model.create({ price: 10, name: "nom", toto: "c est moi" })
-        await Model.findByIdAndUpdate(_id, { name: "nouveauNom" })
+        const { _id } = await Model.create({ price: 10, name: 'nom', toto: 'c est moi' })
+
+        await Model.findByIdAndUpdate(_id, { name: 'nouveauNom' })
 
         const doc = await Model.findOne({ price: 10 })
 
         expect(doc).toEqual(
           expect.objectContaining({
-            "__tokens": expect.arrayContaining([
+            '__tokens': expect.arrayContaining([
               expect.not.objectContaining({
                 changedTo: 'nouveauNom',
                 field: 'name'
@@ -492,8 +507,9 @@ describe('mongooseTracker tests', () => {
         )
       })
     })
+
     describe('updateMany function', () => {
-      it('should update __updates if a values changed which is tracked', async () => {
+      it('should add modified field in __updates if the field is tracked', async () => {
         const schema = new Schema({
           name: String,
           price: Number,
@@ -506,14 +522,14 @@ describe('mongooseTracker tests', () => {
 
         const Model = mongoose.model('test17', schema)
 
-        await Model.create({ price: 10, name: "nom", toto: "c est moi" })
-        await Model.updateMany({ price: 10 }, { name: "nouveauNom" })
+        await Model.create({ price: 10, name: 'nom', toto: 'c est moi' })
+        await Model.updateMany({ price: 10 }, { name: 'nouveauNom' })
 
         const doc = await Model.findOne({ price: 10 })
 
         expect(doc).toEqual(
           expect.objectContaining({
-            "__updates": expect.arrayContaining([
+            '__updates': expect.arrayContaining([
               expect.objectContaining({
                 changedTo: 'nouveauNom',
                 field: 'name'
@@ -522,7 +538,8 @@ describe('mongooseTracker tests', () => {
           })
         )
       })
-      it('should not update __updates if a values changed which is not tracked', async () => {
+
+      it('should not add modified field in __updates if the field is not tracked', async () => {
         const schema = new Schema({
           name: String,
           price: Number,
@@ -535,14 +552,14 @@ describe('mongooseTracker tests', () => {
 
         const Model = mongoose.model('test18', schema)
 
-        await Model.create({ price: 10, name: "nom", toto: "c est moi" })
-        await Model.updateMany({ price: 10 }, { name: "nouveauNom" })
+        await Model.create({ price: 10, name: 'nom', toto: 'c est moi' })
+        await Model.updateMany({ price: 10 }, { name: 'nouveauNom' })
 
         const doc = await Model.findOne({ price: 10 })
 
         expect(doc).toEqual(
           expect.objectContaining({
-            "__updates": expect.arrayContaining([
+            '__updates': expect.arrayContaining([
               expect.not.objectContaining({
                 changedTo: 'nouveauNom',
                 field: 'name'
@@ -551,7 +568,8 @@ describe('mongooseTracker tests', () => {
           })
         )
       })
-      it('should updates the given name in template if a values changed which is tracked', async () => {
+
+      it('should add modified field in __tokens if the field is tracked', async () => {
         const schema = new Schema({
           name: String,
           price: Number,
@@ -560,19 +578,19 @@ describe('mongooseTracker tests', () => {
 
         schema.plugin(mongooseTracker, {
           fieldsToTrack: ['name', 'toto'],
-          name: "__tokens"
+          name: '__tokens'
         })
 
         const Model = mongoose.model('test19', schema)
 
-        await Model.create({ price: 10, name: "nom", toto: "c est moi" })
-        await Model.updateMany({ price: 10 }, { name: "nouveauNom" })
+        await Model.create({ price: 10, name: 'nom', toto: 'c est moi' })
+        await Model.updateMany({ price: 10 }, { name: 'nouveauNom' })
 
         const doc = await Model.findOne({ price: 10 })
 
         expect(doc).toEqual(
           expect.objectContaining({
-            "__tokens": expect.arrayContaining([
+            '__tokens': expect.arrayContaining([
               expect.objectContaining({
                 changedTo: 'nouveauNom',
                 field: 'name'
@@ -581,7 +599,8 @@ describe('mongooseTracker tests', () => {
           })
         )
       })
-      it('should not update the given name in template if a values changed which is not tracked', async () => {
+
+      it('should add modified field in __tokens if the field is not tracked', async () => {
         const schema = new Schema({
           name: String,
           price: Number,
@@ -590,19 +609,19 @@ describe('mongooseTracker tests', () => {
 
         schema.plugin(mongooseTracker, {
           fieldsToTrack: ['toto'],
-          name: "__tokens"
+          name: '__tokens'
         })
 
         const Model = mongoose.model('test20', schema)
 
-        await Model.create({ price: 10, name: "nom", toto: "c est moi" })
-        await Model.updateMany({ price: 10 }, { name: "nouveauNom" })
+        await Model.create({ price: 10, name: 'nom', toto: 'c est moi' })
+        await Model.updateMany({ price: 10 }, { name: 'nouveauNom' })
 
         const doc = await Model.findOne({ price: 10 })
 
         expect(doc).toEqual(
           expect.objectContaining({
-            "__tokens": expect.arrayContaining([
+            '__tokens': expect.arrayContaining([
               expect.not.objectContaining({
                 changedTo: 'nouveauNom',
                 field: 'name'
@@ -611,7 +630,8 @@ describe('mongooseTracker tests', () => {
           })
         )
       })
-      it('should update 2 doc __updates if a values changed in each doc which is tracked', async () => {
+
+      it('should update 2 document if these documents have the field is tracked', async () => {
         const schema = new Schema({
           name: String,
           price: Number,
@@ -624,16 +644,15 @@ describe('mongooseTracker tests', () => {
 
         const Model = mongoose.model('test21', schema)
 
-        await Model.create({ price: 10, name: "nom", toto: "c est moi" })
-        await Model.create({ price: 10, name: "nom", toto: "c est moi" })
-        await Model.updateMany({ price: 10 }, { name: "nouveauNom" })
+        await Model.create({ price: 10, name: 'nom', toto: 'c est moi' })
+        await Model.create({ price: 10, name: 'nom', toto: 'c est moi' })
+        await Model.updateMany({ price: 10 }, { name: 'nouveauNom' })
 
         const docs = await Model.find({ price: 10 })
-        console.log(JSON.stringify(docs, null, 4))
 
         expect(docs[0]).toEqual(
           expect.objectContaining({
-            "__updates": expect.arrayContaining([
+            '__updates': expect.arrayContaining([
               expect.objectContaining({
                 changedTo: 'nouveauNom',
                 field: 'name'
@@ -643,7 +662,7 @@ describe('mongooseTracker tests', () => {
         )
         expect(docs[1]).toEqual(
           expect.objectContaining({
-            "__updates": expect.arrayContaining([
+            '__updates': expect.arrayContaining([
               expect.objectContaining({
                 changedTo: 'nouveauNom',
                 field: 'name'
@@ -655,5 +674,3 @@ describe('mongooseTracker tests', () => {
     })
   })
 })
-
-export { }

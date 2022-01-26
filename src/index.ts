@@ -1,10 +1,7 @@
 import { Schema } from 'mongoose'
 import { get, includes, isNull, toPairs, reduce } from 'lodash'
 
-interface Options {
-  fieldsToTrack: [string]
-  name: string
-}
+import { Options } from './interfaces'
 
 const mongooseTracker = function (schema: Schema, options: Options): void {
   const { name = '__updates', fieldsToTrack } = options
@@ -29,7 +26,7 @@ const mongooseTracker = function (schema: Schema, options: Options): void {
     }
   })
 
-  schema.pre(['updateOne', 'findOneAndUpdate', 'update', 'updateMany'], async function () {
+  schema.pre(['updateOne', 'findOneAndUpdate', 'update', 'updateMany'], async function (done) {
     const updatedFields = this.getUpdate()
 
     if (isNull(updatedFields)) {
@@ -51,7 +48,7 @@ const mongooseTracker = function (schema: Schema, options: Options): void {
     const docUpdated = await this.model.findOne(this.getQuery())
     const oldTrackedFields = docUpdated.get(`${name}`)
 
-    this.set({
+    this.clone().set({
       [name]: [...oldTrackedFields, ...trackedFields]
     }).catch((err) => console.log(err))
   })
