@@ -70,7 +70,7 @@ describe('mongooseTracker tests', () => {
 
   describe('pre functions', () => {
     describe('save function', () => {
-      it('should not add modified field in __updates if the field is not tracked', () => {
+      it('should not add modified field in __updates if the field is not tracked', async () => {
         const schema = new Schema({
           price: Number
         })
@@ -87,7 +87,7 @@ describe('mongooseTracker tests', () => {
 
         doc.price = 1
 
-        doc.save()
+        await doc.save()
 
         expect(doc).toEqual(
           expect.objectContaining({
@@ -696,10 +696,15 @@ describe('mongooseTracker tests', () => {
 
         for await (const index of range(15)) {
           const doc = await Model.findOne({ price: 10 })
+          
           doc.name = "name :" + index
+          
           await doc.save()
+          
           const doc2 = await Model.findOne({ price: 10 })
+          
           doc2.toto = "toto :" + index
+          
           await doc2.save()
         }
 
@@ -733,13 +738,18 @@ describe('mongooseTracker tests', () => {
 
         for await (const index of range(50)) {
           const doc = await Model.findOne({ price: 10 })
+          
           doc.name = "name :" + index
+          
           await doc.save()
+          
           const doc2 = await Model.findOne({ price: 10 })
+          
           doc2.toto = "toto :" + index
+          
           await doc2.save()
         }
-
+        
         const docExpected = await Model.findOne({ price: 10 })
 
         expect(docExpected.__updates).toHaveLength(
@@ -747,7 +757,7 @@ describe('mongooseTracker tests', () => {
         )
 
         expect(nth(docExpected.__updates, 49)).toEqual(expect.objectContaining({
-          field: 'name', changedTo:  'name :49'
+          field: 'name', changedTo: 'name :49'
         }))
       })
     })
