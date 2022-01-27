@@ -1,6 +1,8 @@
 import mongoose from 'mongoose'
 import { Schema } from 'mongoose'
 import { MongoMemoryServer } from 'mongodb-memory-server'
+import { times, range, nth } from 'lodash'
+
 
 import mongooseTracker from '../src/index'
 
@@ -29,7 +31,7 @@ describe('mongooseTracker tests', () => {
     await mongoose.disconnect()
   })
 
-  describe('tracker array key name', () => {
+  describe('tracker array key name options', () => {
     it('should create Array in model with the key name "__updates" by default', () => {
       const schema = new Schema({
         name: String
@@ -669,6 +671,144 @@ describe('mongooseTracker tests', () => {
               })
             ])
           })
+        )
+      })
+    })
+  })
+
+  describe('Limit options', () => {
+    describe('Save Hook', () => {
+      it('should limit by default 30 elements in __updates', async () => {
+        const schema = new Schema({
+          name: String,
+          price: Number,
+          toto: String
+        })
+
+        schema.plugin(mongooseTracker, {
+          fieldsToTrack: ['name', 'toto']
+        })
+
+        const Model = mongoose.model('test22', schema)
+
+        await Model.create({ price: 10, name: 'nom', toto: 'c est moi' })
+
+
+        for await (const index of range(15)) {
+          const doc = await Model.findOne({ price: 10 })
+          doc.name = "name :" + index
+          await doc.save()
+          const doc2 = await Model.findOne({ price: 10 })
+          doc2.toto = "toto :" + index
+          await doc2.save()
+        }
+
+        const docExpected = await Model.findOne({ price: 10 })
+
+        expect(docExpected.__updates).toHaveLength(
+          30
+        )
+
+        expect(nth(docExpected.__updates, 29)).toEqual(expect.objectContaining({
+          field: 'toto', changedTo: 'toto :14'
+        }))
+      })
+
+      it('should limit 50 elements in __updates', async () => {
+        const schema = new Schema({
+          name: String,
+          price: Number,
+          toto: String
+        })
+
+        schema.plugin(mongooseTracker, {
+          fieldsToTrack: ['name'],
+          limit: 50
+        })
+
+        const Model = mongoose.model('test23', schema)
+
+        await Model.create({ price: 10, name: 'nom', toto: 'c est moi' })
+
+
+        for await (const index of range(50)) {
+          const doc = await Model.findOne({ price: 10 })
+          doc.name = "name :" + index
+          await doc.save()
+          const doc2 = await Model.findOne({ price: 10 })
+          doc2.toto = "toto :" + index
+          await doc2.save()
+        }
+
+        const docExpected = await Model.findOne({ price: 10 })
+
+        expect(docExpected.__updates).toHaveLength(
+          50
+        )
+
+        expect(nth(docExpected.__updates, 49)).toEqual(expect.objectContaining({
+          field: 'name', changedTo:  'name :49'
+        }))
+      })
+    })
+
+    describe('Updates Hook', () => {
+      it('should limit by default 30 elements in __updates', async () => {
+        const schema = new Schema({
+          name: String,
+          price: Number,
+          toto: String
+        })
+
+        schema.plugin(mongooseTracker, {
+          fieldsToTrack: ['name']
+        })
+
+        const Model = mongoose.model('test24', schema)
+
+        await Model.create({ price: 10, name: 'nom', toto: 'c est moi' })
+        await Model.findOneAndUpdate({ price: 10 }, { name: 'nouveauNom' })
+
+
+        for (const index of range(30)) {
+          await Model.findOneAndUpdate({ price: 10 }, { name: 'toto' })
+          await Model.findOneAndUpdate({ price: 10 }, { name: 'test' })
+        }
+
+        const doc = await Model.findOne({ price: 10 })
+
+        expect(doc.__updates).toHaveLength(
+          30
+        )
+      })
+
+      it('should limit 50 elements in __updates', async () => {
+        const schema = new Schema({
+          name: String,
+          price: Number,
+          toto: String
+        })
+
+        schema.plugin(mongooseTracker, {
+          fieldsToTrack: ['name'],
+          limit: 50
+        })
+
+        const Model = mongoose.model('test25', schema)
+
+        await Model.create({ price: 10, name: 'nom', toto: 'c est moi' })
+        await Model.findOneAndUpdate({ price: 10 }, { name: 'nouveauNom' })
+
+
+        for (const index of range(50)) {
+          await Model.findOneAndUpdate({ price: 10 }, { name: 'toto' })
+          await Model.findOneAndUpdate({ price: 10 }, { name: 'test' })
+        }
+
+        const doc = await Model.findOne({ price: 10 })
+
+        expect(doc.__updates).toHaveLength(
+          50
         )
       })
     })

@@ -1,23 +1,27 @@
 import { Schema } from 'mongoose'
-import { get, includes, isNull, toPairs, reduce } from 'lodash'
+import { get, includes, isNull, toPairs, reduce, takeRight, size } from 'lodash'
 
 import { Options } from './interfaces'
 
 const mongooseTracker = function (schema: Schema, options: Options): void {
-  const { name = '__updates', fieldsToTrack } = options
+  const { name = '__updates', fieldsToTrack, limit = 30 } = options
 
   schema.add({
     [name]: Array
   })
-
-  // TODO : permettre une valeur limite du nombre de d'updates via Options
 
   schema.pre('save', function (): void {
     const updatedFields = this.directModifiedPaths()
 
     for (const field of updatedFields) {
       if (includes(fieldsToTrack, field)) {
-        this.get(`${name}`).push({
+        const trackFields = this.get(`${name}`)
+
+        if (size(trackFields) >= limit) {
+          trackFields.pop(-1)
+        }
+
+        trackFields.push({
           field: `${field}`,
           changedTo: get(this, field, ''),
           at: Date.now()
@@ -49,7 +53,7 @@ const mongooseTracker = function (schema: Schema, options: Options): void {
     const oldTrackedFields = docUpdated.get(`${name}`)
 
     this.clone().set({
-      [name]: [...oldTrackedFields, ...trackedFields]
+      [name]: takeRight([...oldTrackedFields, ...trackedFields], limit)
     }).catch((err) => console.log(err))
   })
 }

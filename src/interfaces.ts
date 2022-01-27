@@ -1,4 +1,5 @@
 export interface Options {
-  fieldsToTrack: string[]
   name: string
+  limit: number
+  fieldsToTrack: string[]
 }
