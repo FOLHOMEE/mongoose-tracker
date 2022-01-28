@@ -1,11 +1,9 @@
 # Mongoose Tracker
 
-
 Mongoose Tracker is a mongoose plugin that automatically keeps track of when the document has been created & updated.
 Rewrite from old [mongoose-trackable](https://www.npmjs.com/package/mongoose-trackable) which has not been updated for 7 years
 
 ## Installation
-
 
 With [npm](https://npmjs.org)
 
@@ -27,7 +25,6 @@ yarn add @folhomee/mongoose-tracker
 |     **limit**     |    Number     |     30      |     Number of element in fieldsToTrack      |
 
 ## Usage
-
 
 Use as you would any Mongoose plugin :
 
@@ -63,9 +60,11 @@ When create/update is successful, a [**History**](#History) element is pushed to
 |      **at**      |  Date  |  time at modification  |
 
 ## Contributing
+
 - Use eslint to lint your code.
 - Add tests for any new or changed functionality.
 - Update the readme with an example if you add or change any functionality.
 
 ## Legal
+
 Author: [Folhomee](https://www.folhomee.fr/). License Apache-2.0
