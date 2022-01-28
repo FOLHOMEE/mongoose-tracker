@@ -66,5 +66,6 @@ When create/update is successful, a [**History**](#History) element is pushed to
 - Use eslint to lint your code.
 - Add tests for any new or changed functionality.
 - Update the readme with an example if you add or change any functionality.
+
 ## Legal
 Author: [Folhomee](https://www.folhomee.fr/). License Apache-2.0
