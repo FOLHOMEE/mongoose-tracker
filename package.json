@@ -1,5 +1,5 @@
 {
-  "name": "mongoose-tracker",
+  "name": "@folhomee/mongoose-tracker",
   "version": "1.0.1",
   "description": "Is a mongoose plugin that automatically keeps track of when the document has been created, updated and optionally when some fields have been modified",
   "main": "./build/index.js",
