@@ -5,7 +5,7 @@
   "main": "./build/index.js",
   "types": "./build/index.d.ts",
   "module": "./build/index.es.js",
-  "author": "barder60 <kaderate.yamamoto@hotmail.fr>",
+  "author": "Folhomee <contact@folhomee.fr>",
   "license": "Apache-2.0",
   "keywords": [
     "mongoose",
@@ -19,6 +19,7 @@
     "url" : "https://github.com/FOLHOMEE/mongoose-tracker/issues",
     "email" : "contact@folhomee.fr"
   },
+  "repository": "https://github.com/FOLHOMEE/mongoose-tracker",
   "files": [
     "build"
   ],
