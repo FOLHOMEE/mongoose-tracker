@@ -1,12 +1,27 @@
 {
   "name": "mongoose-tracker",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Is a mongoose plugin that automatically keeps track of when the document has been created, updated and optionally when some fields have been modified",
   "main": "./build/index.js",
   "types": "./build/index.d.ts",
   "module": "./build/index.es.js",
   "author": "barder60 <kaderate.yamamoto@hotmail.fr>",
-  "license": "MIT",
+  "license": "Apache-2.0",
+  "keywords": [
+    "mongoose",
+    "plugin",
+    "timestamp",
+    "created",
+    "updated",
+    "changed"
+  ],
+  "bugs": {
+    "url" : "https://github.com/FOLHOMEE/mongoose-tracker/issues",
+    "email" : "contact@folhomee.fr"
+  },
+  "files": [
+    "build"
+  ],
   "scripts": {
     "build": "rollup -c",
     "clean": "rimraf build",
@@ -20,7 +35,9 @@
     "node": ">=14.0.0"
   },
   "peerDependencies": {
-    "mongoose": "^6.1.5",
+    "mongoose": "^6.1.5"
+  },
+  "dependencies": {
     "lodash": "^4.17.21"
   },
   "devDependencies": {
