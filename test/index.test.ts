@@ -1,4 +1,5 @@
 import mongoose from 'mongoose'
+import { faker } from '@faker-js/faker'
 import { Schema } from 'mongoose'
 import { MongoMemoryServer } from 'mongodb-memory-server'
 import { times, range, nth } from 'lodash'
@@ -39,7 +40,7 @@ describe('mongooseTracker tests', () => {
 
       schema.plugin(mongooseTracker, {})
 
-      const Model = mongoose.model('test1', schema)
+      const Model = mongoose.model(faker.internet.password(), schema)
 
       const doc = new Model({})
 
@@ -56,7 +57,7 @@ describe('mongooseTracker tests', () => {
         name: '__tokens'
       })
 
-      const Model = mongoose.model('test2', schema)
+      const Model = mongoose.model(faker.internet.password(), schema)
 
       const doc = new Model({})
 
@@ -79,7 +80,7 @@ describe('mongooseTracker tests', () => {
           fieldsToTrack: ['name']
         })
 
-        const Model = mongoose.model('test3', schema)
+        const Model = mongoose.model(faker.internet.password(), schema)
 
         const doc = new Model({
           price: 0
@@ -107,7 +108,7 @@ describe('mongooseTracker tests', () => {
           fieldsToTrack: ['name', 'toto']
         })
 
-        const Model = mongoose.model('test4', schema)
+        const Model = mongoose.model(faker.internet.password(), schema)
 
         const doc = new Model({})
 
@@ -134,6 +135,36 @@ describe('mongooseTracker tests', () => {
     })
 
     describe('findOneAndUpdate function', () => {
+      it('should do nothing if object does not exist', async () => {
+        const schema = new Schema({
+          name: String,
+          price: Number,
+          toto: String
+        })
+
+        schema.plugin(mongooseTracker, {
+          fieldsToTrack: ['name', 'toto']
+        })
+
+        const Model = mongoose.model(faker.internet.password(), schema)
+        await Model.create({ price: 10, name: 'nom', toto: 'c est moi' })
+
+        await Model.findByIdAndUpdate(new mongoose.Types.ObjectId(), { name: 'nouveauNom' })
+
+        const doc = await Model.findOne({ price: 10 })
+
+        expect(doc).not.toEqual(
+          expect.objectContaining({
+            '__updates': expect.arrayContaining([
+              expect.objectContaining({
+                changedTo: 'nouveauNom',
+                field: 'name'
+              })
+            ])
+          })
+        )
+      })
+
       it('should add modified field in __updates if the field is tracked', async () => {
         const schema = new Schema({
           name: String,
@@ -145,7 +176,7 @@ describe('mongooseTracker tests', () => {
           fieldsToTrack: ['name', 'toto']
         })
 
-        const Model = mongoose.model('test5', schema)
+        const Model = mongoose.model(faker.internet.password(), schema)
 
         await Model.create({ price: 10, name: 'nom', toto: 'c est moi' })
         await Model.findOneAndUpdate({ price: 10 }, { name: 'nouveauNom' })
@@ -175,7 +206,7 @@ describe('mongooseTracker tests', () => {
           fieldsToTrack: ['toto']
         })
 
-        const Model = mongoose.model('test6', schema)
+        const Model = mongoose.model(faker.internet.password(), schema)
 
         await Model.create({ price: 10, name: 'nom', toto: 'c est moi' })
         await Model.findOneAndUpdate({ price: 10 }, { name: 'nouveauNom' })
@@ -206,7 +237,7 @@ describe('mongooseTracker tests', () => {
           name: '__tokens'
         })
 
-        const Model = mongoose.model('test7', schema)
+        const Model = mongoose.model(faker.internet.password(), schema)
 
         await Model.create({ price: 10, name: 'nom', toto: 'c est moi' })
         await Model.findOneAndUpdate({ price: 10 }, { name: 'nouveauNom' })
@@ -237,7 +268,7 @@ describe('mongooseTracker tests', () => {
           name: '__tokens'
         })
 
-        const Model = mongoose.model('test8', schema)
+        const Model = mongoose.model(faker.internet.password(), schema)
 
         await Model.create({ price: 10, name: 'nom', toto: 'c est moi' })
         await Model.findOneAndUpdate({ price: 10 }, { name: 'nouveauNom' })
@@ -269,7 +300,7 @@ describe('mongooseTracker tests', () => {
           fieldsToTrack: ['name', 'toto']
         })
 
-        const Model = mongoose.model('test9', schema)
+        const Model = mongoose.model(faker.internet.password(), schema)
 
         await Model.create({ price: 10, name: 'nom', toto: 'c est moi' })
         await Model.updateOne({ price: 10 }, { name: 'nouveauNom' })
@@ -299,7 +330,7 @@ describe('mongooseTracker tests', () => {
           fieldsToTrack: ['toto']
         })
 
-        const Model = mongoose.model('test10', schema)
+        const Model = mongoose.model(faker.internet.password(), schema)
 
         await Model.create({ price: 10, name: 'nom', toto: 'c est moi' })
         await Model.updateOne({ price: 10 }, { name: 'nouveauNom' })
@@ -330,7 +361,7 @@ describe('mongooseTracker tests', () => {
           name: '__tokens'
         })
 
-        const Model = mongoose.model('test11', schema)
+        const Model = mongoose.model(faker.internet.password(), schema)
 
         await Model.create({ price: 10, name: 'nom', toto: 'c est moi' })
         await Model.updateOne({ price: 10 }, { name: 'nouveauNom' })
@@ -362,7 +393,7 @@ describe('mongooseTracker tests', () => {
           name: '__tokens'
         })
 
-        const Model = mongoose.model('test12', schema)
+        const Model = mongoose.model(faker.internet.password(), schema)
 
         await Model.create({ price: 10, name: 'nom', toto: 'c est moi' })
         await Model.updateOne({ price: 10 }, { name: 'nouveauNom' })
@@ -394,7 +425,7 @@ describe('mongooseTracker tests', () => {
           fieldsToTrack: ['name', 'toto']
         })
 
-        const Model = mongoose.model('test13', schema)
+        const Model = mongoose.model(faker.internet.password(), schema)
 
         const { _id } = await Model.create({ price: 10, name: 'nom', toto: 'c est moi' })
 
@@ -425,7 +456,7 @@ describe('mongooseTracker tests', () => {
           fieldsToTrack: ['toto']
         })
 
-        const Model = mongoose.model('test14', schema)
+        const Model = mongoose.model(faker.internet.password(), schema)
 
         const { _id } = await Model.create({ price: 10, name: 'nom', toto: 'c est moi' })
 
@@ -457,7 +488,7 @@ describe('mongooseTracker tests', () => {
           name: '__tokens'
         })
 
-        const Model = mongoose.model('test15', schema)
+        const Model = mongoose.model(faker.internet.password(), schema)
 
         const { _id } = await Model.create({ price: 10, name: 'nom', toto: 'c est moi' })
 
@@ -489,7 +520,7 @@ describe('mongooseTracker tests', () => {
           name: '__tokens'
         })
 
-        const Model = mongoose.model('test16', schema)
+        const Model = mongoose.model(faker.internet.password(), schema)
 
         const { _id } = await Model.create({ price: 10, name: 'nom', toto: 'c est moi' })
 
@@ -522,7 +553,7 @@ describe('mongooseTracker tests', () => {
           fieldsToTrack: ['name', 'toto']
         })
 
-        const Model = mongoose.model('test17', schema)
+        const Model = mongoose.model(faker.internet.password(), schema)
 
         await Model.create({ price: 10, name: 'nom', toto: 'c est moi' })
         await Model.updateMany({ price: 10 }, { name: 'nouveauNom' })
@@ -552,7 +583,7 @@ describe('mongooseTracker tests', () => {
           fieldsToTrack: ['toto']
         })
 
-        const Model = mongoose.model('test18', schema)
+        const Model = mongoose.model(faker.internet.password(), schema)
 
         await Model.create({ price: 10, name: 'nom', toto: 'c est moi' })
         await Model.updateMany({ price: 10 }, { name: 'nouveauNom' })
@@ -583,7 +614,7 @@ describe('mongooseTracker tests', () => {
           name: '__tokens'
         })
 
-        const Model = mongoose.model('test19', schema)
+        const Model = mongoose.model(faker.internet.password(), schema)
 
         await Model.create({ price: 10, name: 'nom', toto: 'c est moi' })
         await Model.updateMany({ price: 10 }, { name: 'nouveauNom' })
@@ -614,7 +645,7 @@ describe('mongooseTracker tests', () => {
           name: '__tokens'
         })
 
-        const Model = mongoose.model('test20', schema)
+        const Model = mongoose.model(faker.internet.password(), schema)
 
         await Model.create({ price: 10, name: 'nom', toto: 'c est moi' })
         await Model.updateMany({ price: 10 }, { name: 'nouveauNom' })
@@ -644,7 +675,7 @@ describe('mongooseTracker tests', () => {
           fieldsToTrack: ['name', 'toto']
         })
 
-        const Model = mongoose.model('test21', schema)
+        const Model = mongoose.model(faker.internet.password(), schema)
 
         await Model.create({ price: 10, name: 'nom', toto: 'c est moi' })
         await Model.create({ price: 10, name: 'nom', toto: 'c est moi' })
@@ -689,7 +720,7 @@ describe('mongooseTracker tests', () => {
           fieldsToTrack: ['name', 'toto']
         })
 
-        const Model = mongoose.model('test22', schema)
+        const Model = mongoose.model(faker.internet.password(), schema)
 
         await Model.create({ price: 10, name: 'nom', toto: 'c est moi' })
 
@@ -731,7 +762,7 @@ describe('mongooseTracker tests', () => {
           limit: 50
         })
 
-        const Model = mongoose.model('test23', schema)
+        const Model = mongoose.model(faker.internet.password(), schema)
 
         await Model.create({ price: 10, name: 'nom', toto: 'c est moi' })
 
@@ -774,7 +805,7 @@ describe('mongooseTracker tests', () => {
           fieldsToTrack: ['name']
         })
 
-        const Model = mongoose.model('test24', schema)
+        const Model = mongoose.model(faker.internet.password(), schema)
 
         await Model.create({ price: 10, name: 'nom', toto: 'c est moi' })
         await Model.findOneAndUpdate({ price: 10 }, { name: 'nouveauNom' })
@@ -804,7 +835,7 @@ describe('mongooseTracker tests', () => {
           limit: 50
         })
 
-        const Model = mongoose.model('test25', schema)
+        const Model = mongoose.model(faker.internet.password(), schema)
 
         await Model.create({ price: 10, name: 'nom', toto: 'c est moi' })
         await Model.findOneAndUpdate({ price: 10 }, { name: 'nouveauNom' })

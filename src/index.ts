@@ -50,6 +50,11 @@ const mongooseTracker = function (schema: Schema, options: Options): void {
     }, [])
 
     const docUpdated = await this.model.findOne(this.getQuery())
+
+    if (!docUpdated) {
+      return
+    }
+
     const oldTrackedFields = docUpdated.get(`${name}`)
 
     this.clone().set({
