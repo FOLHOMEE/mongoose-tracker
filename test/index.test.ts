@@ -195,6 +195,28 @@ describe('mongooseTracker tests', () => {
         )
       })
 
+      it('should not add modified field in __updates if the field is not tracked when increment', async () => {
+        const schema = new Schema({
+          name: String,
+          price: Number,
+          toto: String
+        })
+
+        schema.plugin(mongooseTracker, {
+          fieldsToTrack: ['name']
+        })
+
+        const Model = mongoose.model(faker.internet.password(), schema)
+
+        const item = await Model.create({ price: 10, name: 'nom', toto: 'c est moi' })
+
+        await Model.findOneAndUpdate({ _id: item._id }, { $inc: { price: 1 } })
+
+        const updated = await Model.findById(item._id)
+
+        expect(updated.price).toEqual(item.price + 1)
+      })
+
       it('should not add modified field in __updates if the field is not tracked', async () => {
         const schema = new Schema({
           name: String,

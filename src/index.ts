@@ -1,5 +1,5 @@
 import { Schema } from 'mongoose'
-import { get, includes, isNull, toPairs, reduce, takeRight, size } from 'lodash'
+import { get, includes, isNull, toPairs, reduce, takeRight, size, isEmpty } from 'lodash'
 
 import { Options } from './interfaces'
 
@@ -48,6 +48,10 @@ const mongooseTracker = function (schema: Schema, options: Options): void {
 
       return acc
     }, [])
+
+    if (isEmpty(trackedFields)) {
+      return
+    }
 
     const docUpdated = await this.model.findOne(this.getQuery())
 
