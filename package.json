@@ -1,6 +1,6 @@
 {
   "name": "@folhomee/mongoose-tracker",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "Is a mongoose plugin that automatically keeps track of when the document has been created, updated and optionally when some fields have been modified",
   "main": "./build/index.js",
   "types": "./build/index.d.ts",
@@ -61,6 +61,7 @@
     "eslint-plugin-node": "^11.1.0",
     "eslint-plugin-promise": "^6.0.0",
     "eslint-plugin-standard": "^5.0.0",
+    "husky": "^7.0.4",
     "jest": "^27.4.7",
     "mongodb-memory-server": "^8.1.0",
     "rimraf": "^3.0.2",

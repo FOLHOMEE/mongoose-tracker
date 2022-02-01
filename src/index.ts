@@ -51,7 +51,7 @@ const mongooseTracker = function (schema: Schema, options: Options): void {
 
     const docUpdated = await this.model.findOne(this.getQuery())
 
-    if (!docUpdated) {
+    if (isNull(docUpdated)) {
       return
     }
 
