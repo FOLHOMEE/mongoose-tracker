@@ -39,11 +39,11 @@
     "mongoose": "^6.1.5"
   },
   "dependencies": {
-    "@faker-js/faker": "^6.0.0-alpha.5",
     "lodash": "^4.17.21"
   },
   "devDependencies": {
     "@babel/core": "^7.16.7",
+    "@faker-js/faker": "^6.0.0-alpha.5",
     "@rollup/plugin-commonjs": "^21.0.1",
     "@rollup/plugin-json": "^4.1.0",
     "@rollup/plugin-node-resolve": "^13.1.3",
