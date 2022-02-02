@@ -8,12 +8,12 @@ Rewrite from old [mongoose-trackable](https://www.npmjs.com/package/mongoose-tra
 With [npm](https://npmjs.org)
 
 ```
-npm install @folhomee/mongoose-tracker
+npm install @folhomee-public/mongoose-tracker
 ```
 
 With [Yarn](https://yarnpkg.com) : 
 ```
-yarn add @folhomee/mongoose-tracker
+yarn add @folhomee-public/mongoose-tracker
 ```
 
 ## Options
@@ -30,7 +30,7 @@ Use as you would any Mongoose plugin :
 
 ```js
 const mongoose = require('mongoose')
-const mongooseTracker = require('@folhomee/mongoose-tracker')
+const mongooseTracker = require('@folhomee-public/mongoose-tracker')
 
 const { Schema } = mongoose.Schema
 
